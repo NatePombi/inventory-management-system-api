@@ -71,5 +71,58 @@ I’m not done yet here’s what I’ll add next:
 
 * Analytics dashboard (product stock levels, sales trends, etc.)
 
+--- 
+
+### Database Configuration
+
+- This project uses MySQL. Configure it in application.properties.
+
+- Steps to set up the database:
+
+  - Make sure MySQL is installed and running.
+
+  - Create the database:
+
+    - CREATE DATABASE inventoryAPI;
+    - Update the username and password in application.properties to your own.
+    - When you run the Spring Boot app, JPA/Hibernate will automatically create/update tables.
+    - 
+
+
 ---
 
+### How to Use (For Now)
+
+1) Clone the repo
+
+- git clone https://github.com/NatePombi/java-projects.git
+
+
+2) Navigate into the project
+
+- cd inventory-management-system-api
+
+
+3) Run the project
+
+- ./mvnw spring-boot:run
+
+
+4) Open Swagger docs in browser:
+
+- http://localhost:8080/swagger-ui/index.html
+
+---
+## Note on Roles
+
+- When you register a new account:
+
+  - If your email contains “admin”, the system automatically gives you the ADMIN role.
+
+  - Otherwise, you’ll be a USER by default.
+
+---
+
+### Status
+
+- This is a work in progress — I’m pushing it now so I can keep improving later.
