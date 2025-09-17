@@ -1,6 +1,7 @@
 # Inventory Management System API
 
 ![Java CI](https://github.com/NatePombi/inventory-management-system-api/actions/workflows/test.yml/badge.svg)
+![Coverage](https://img.shields.io/codecov/c/github/NatePombi/inventory-management-system-api/main?style=flat-square)
 
 
 This is a Spring Boot REST API I’m building to manage products and users in an inventory system.
