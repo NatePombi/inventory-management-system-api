@@ -30,7 +30,6 @@ public class ProductController {
             @ApiResponse(responseCode = "201", description = "product created , returns product"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not Found")
     })
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody @Valid PostProduct dto, @AuthenticationPrincipal CustomerDetails customerDetails){

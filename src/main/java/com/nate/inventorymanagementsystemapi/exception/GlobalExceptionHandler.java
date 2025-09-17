@@ -1,15 +1,20 @@
 package com.nate.inventorymanagementsystemapi.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.nio.file.AccessDeniedException;
+import javax.naming.AuthenticationException;
 import java.rmi.AccessException;
 import java.time.Instant;
-@RestController
+@RestControllerAdvice
 public class GlobalExceptionHandler {
     record ApiError(Instant timestamp, int status,String error, String message, String path){}
 
@@ -40,6 +45,12 @@ public class GlobalExceptionHandler {
                 .orElse("Failed Validation");
 
         return new ApiError(Instant.now(),400,"Bad Request",msg, req.getRequestURI());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleValidation(MethodArgumentTypeMismatchException ex, jakarta.servlet.http.HttpServletRequest req){
+        return new ApiError(Instant.now(),400,"Bad Request",ex.getMessage(),req.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)
