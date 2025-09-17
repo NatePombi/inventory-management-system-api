@@ -1,5 +1,8 @@
 # Inventory Management System API
 
+![Java CI](https://github.com/NatePombi/inventory-management-system-api/actions/workflows/test.yml/badge.svg)
+
+
 This is a Spring Boot REST API I’m building to manage products and users in an inventory system.
 It supports JWT authentication, role-based access control, and CRUD operations for products.
 
