@@ -9,7 +9,7 @@ public interface IProductService {
 
     List<ProductDto> getAllUserProductsByUsername(String username);
     ProductDto addProduct(PostProduct product, String username);
-    ProductDto getProduct(Long id);
+    ProductDto getProduct(Long id,String username);
     boolean deleteProduct(Long id,String username);
     ProductDto udpateProduct(Long id, ProductDto productUpdate);
 

@@ -2,6 +2,7 @@ package com.nate.inventorymanagementsystemapi.service;
 
 import com.nate.inventorymanagementsystemapi.dto.PostProduct;
 import com.nate.inventorymanagementsystemapi.dto.ProductDto;
+import com.nate.inventorymanagementsystemapi.dto.UserDto;
 import com.nate.inventorymanagementsystemapi.exception.ProductNotFoundException;
 import com.nate.inventorymanagementsystemapi.exception.UserNotFoundException;
 import com.nate.inventorymanagementsystemapi.model.Product;
@@ -58,6 +59,7 @@ public class ProductServiceTest {
         Product prod = mock(Product.class);
         when(prod.getUser()).thenReturn(mockUser);
         when(repo.findAll()).thenReturn(List.of(mockProduct,prod));
+        when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
 
         List<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester");
 
@@ -69,6 +71,8 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Get all User Product by Username Test: No Items present")
     void testGetAllUserProductByUsername_NoItemsPresent(){
+
+        when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
         List<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester");
 
         assertTrue(productDtos.isEmpty(),"Should be empty");
@@ -109,9 +113,9 @@ public class ProductServiceTest {
         mockProduct.setName("Dryer");
         mockProduct.setId(1L);
         when(repo.findById(1L)).thenReturn(Optional.of(mockProduct));
-        when(repo.save(any(Product.class))).thenReturn(mockProduct);
+        when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
 
-        ProductDto prod = service.getProduct(1L);
+        ProductDto prod = service.getProduct(1L,mockUser.getUsername());
 
         assertEquals(1L,prod.getId(),"should have the specified id");
         assertEquals("Dryer",prod.getName(),"should have the same name");
@@ -121,12 +125,23 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Get Product Test: Fail")
-    void testGetProduct_Fail(){
+    void testGetProduct_FailProductNotFound(){
+        when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
         Exception ex = assertThrows(ProductNotFoundException.class,()->{
-            service.getProduct(1L);
+            service.getProduct(1L,mockUser.getUsername());
         });
 
         assertTrue(ex.getMessage().contains("1"));
+    }
+
+    @Test
+    @DisplayName("Get Product Test: Fail")
+    void testGetProduct_FailUserNotFound(){
+        Exception ex = assertThrows(UserNotFoundException.class,()->{
+            service.getProduct(1L,mockUser.getUsername());
+        });
+
+        assertTrue(ex.getMessage().contains(mockUser.getUsername()));
     }
 
 

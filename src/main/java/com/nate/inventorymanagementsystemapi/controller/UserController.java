@@ -1,23 +1,20 @@
-package com.nate.inventorymanagementsystemapi.controll;
+package com.nate.inventorymanagementsystemapi.controller;
 
-import com.nate.inventorymanagementsystemapi.dto.JwtResponse;
 import com.nate.inventorymanagementsystemapi.dto.LoginDto;
 import com.nate.inventorymanagementsystemapi.dto.RegisterDto;
 import com.nate.inventorymanagementsystemapi.dto.UserDto;
+import com.nate.inventorymanagementsystemapi.exception.UserNotFoundException;
 import com.nate.inventorymanagementsystemapi.model.User;
 import com.nate.inventorymanagementsystemapi.service.IUserService;
-import com.nate.inventorymanagementsystemapi.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,17 +47,15 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody @Valid LoginDto loginDto){
-        try{
-
-            UserDto user = service.getByUsername(loginDto.getUsername());
-
-            String token = JwtUtil.generateToken(user.getUsername(),user.getRole());
-
-            return ResponseEntity.ok(new JwtResponse(token));
-        }
-        catch (AuthenticationException e){
-            return ResponseEntity.status(401).body("Invalid Username or Password");
-        }
+       try {
+           return ResponseEntity.ok(service.login(loginDto));
+       }
+       catch (UserNotFoundException ex){
+           return ResponseEntity.status(404).body(ex.getMessage());
+       }
+       catch (RuntimeException ex){
+           return ResponseEntity.status(401).body(ex.getMessage());
+       }
     }
 
     @Operation(summary = "Getting User by Username")

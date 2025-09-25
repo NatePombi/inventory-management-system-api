@@ -11,6 +11,7 @@ import com.nate.inventorymanagementsystemapi.model.User;
 import com.nate.inventorymanagementsystemapi.repository.ProductRepository;
 import com.nate.inventorymanagementsystemapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +26,15 @@ public class ProductService implements IProductService {
 
     @Override
     public List<ProductDto> getAllUserProductsByUsername(String username) {
+       User user = repoU.findByUsername(username).orElseThrow(()-> new UserNotFoundException(username));
+
+       if (user.getRole().equals(Role.ADMIN)) {
+           return repo.findAll().stream()
+                   .map(ProductMapper::toDto)
+                   .toList();
+       }
+
+
         return repo.findAll().stream()
                 .filter(m-> m.getUser().getUsername().equals(username))
                 .map(ProductMapper::toDto)
@@ -48,12 +58,18 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductDto getProduct(Long id) {
+    public ProductDto getProduct(Long id,String username) {
+        User user = repoU.findByUsername(username)
+                .orElseThrow(()->new UserNotFoundException(username));
+
         Product product = repo.findById(id)
                 .orElseThrow(()-> new ProductNotFoundException(id));
 
-        Product saved = repo.save(product);
-        return ProductMapper.toDto(saved);
+        if(!product.getUser().getId().equals(user.getId()) && !user.getRole().equals(Role.ADMIN)){
+            throw new AccessDeniedException("Not Authorized");
+        }
+
+        return ProductMapper.toDto(product);
     }
 
     @Override
@@ -68,11 +84,13 @@ public class ProductService implements IProductService {
         if (user.getRole().equals(Role.ADMIN)) {
             repo.delete(product);
             return true;
+        } else if (product.getUser().getId().equals(user.getId())) {
+            repo.delete(product);
+            return true;
         }
 
 
-            repo.delete(product);
-            return true;
+        throw new AccessDeniedException("Dont have Authorization");
     }
 
     @Override
@@ -84,12 +102,9 @@ public class ProductService implements IProductService {
 
 
 
-        product.setId(id);
-        product.setName(productUpdate.getName());
-        product.setQuantity(productUpdate.getQuantity());
-        product.setPrice(productUpdate.getPrice());
+        Product updateProd = ProductMapper.updateEntity(product,productUpdate);
 
-        repo.save(product);
+        repo.save(updateProd);
         return ProductMapper.toDto(product);
     }
 }

@@ -1,21 +1,16 @@
 package com.nate.inventorymanagementsystemapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nate.inventorymanagementsystemapi.controll.ProductController;
 import com.nate.inventorymanagementsystemapi.dto.PostProduct;
 import com.nate.inventorymanagementsystemapi.dto.ProductDto;
 import com.nate.inventorymanagementsystemapi.exception.ProductNotFoundException;
 import com.nate.inventorymanagementsystemapi.model.CustomerDetails;
-import com.nate.inventorymanagementsystemapi.model.User;
-import com.nate.inventorymanagementsystemapi.repository.ProductRepository;
 import com.nate.inventorymanagementsystemapi.security.JwtFilterAuth;
 import com.nate.inventorymanagementsystemapi.service.IProductService;
-import com.nate.inventorymanagementsystemapi.service.ProductService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.tomcat.Jar;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -23,22 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -46,6 +34,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -163,7 +152,7 @@ public class ProductControllerTest {
         void testGetProductByID() throws Exception {
             ProductDto dto = new ProductDto(2L, "Laptop", 4, new BigDecimal("100"), 1L);
 
-            Mockito.when(service.getProduct(2L)).thenReturn(dto);
+            Mockito.when(service.getProduct(2L,details.getUsername())).thenReturn(dto);
 
             mockMvc.perform(get("/product/2")
                             .header("Authorization", "Bearer fake-jwt-token")
@@ -187,7 +176,7 @@ public class ProductControllerTest {
 
         @Test
         void testGetProductByID_FailAccessDenied() throws Exception {
-            Mockito.when(service.getProduct(1L)).thenThrow(new AccessDeniedException("Forbidden"));
+            Mockito.when(service.getProduct(1L,details.getUsername())).thenThrow(new AccessDeniedException("Forbidden"));
             mockMvc.perform(get("/product/1")
                             .with(csrf()))
                     .andExpect(status().isForbidden());
@@ -291,6 +280,9 @@ public class ProductControllerTest {
                     .andExpect(status().isForbidden());
         }
     }
+
+
+
 
         @TestConfiguration
         static class MockConfig {

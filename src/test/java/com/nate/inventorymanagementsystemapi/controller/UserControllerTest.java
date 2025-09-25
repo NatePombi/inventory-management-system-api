@@ -1,7 +1,7 @@
 package com.nate.inventorymanagementsystemapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nate.inventorymanagementsystemapi.controll.UserController;
+import com.nate.inventorymanagementsystemapi.dto.JwtResponse;
 import com.nate.inventorymanagementsystemapi.dto.LoginDto;
 import com.nate.inventorymanagementsystemapi.dto.RegisterDto;
 import com.nate.inventorymanagementsystemapi.dto.UserDto;
@@ -21,8 +21,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -30,9 +28,9 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -97,14 +95,16 @@ public class UserControllerTest {
 
         @Test
         void testLogin_Success() throws Exception {
-            UserDto dto = new UserDto();
-            Mockito.when(service.getByUsername(anyString())).thenReturn(dto);
+            JwtResponse response = new JwtResponse("fake-token");
+            Mockito.when(service.login(any(LoginDto.class))).thenReturn(response);
 
             mockMvc.perform(post("/auth/login")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(mapper.writeValueAsString(dtoLog)))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.token").value("fake-token"));
+
         }
 
         @Test
@@ -123,13 +123,24 @@ public class UserControllerTest {
 
         @Test
         void testLogin_FailUserNotFound() throws Exception {
-            Mockito.when(service.getByUsername(anyString())).thenThrow(new UserNotFoundException("tester"));
+            Mockito.when(service.login(any(LoginDto.class))).thenThrow(new UserNotFoundException("Not Found"));
 
             mockMvc.perform(post("/auth/login")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(mapper.writeValueAsString(dtoLog)))
                     .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void testLogin_FailWrongPassword() throws Exception {
+            Mockito.when(service.login(any(LoginDto.class))).thenThrow(new RuntimeException());
+
+            mockMvc.perform(post("/auth/login")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(dtoLog)))
+                    .andExpect(status().isUnauthorized());
         }
     }
 

@@ -1,5 +1,7 @@
 package com.nate.inventorymanagementsystemapi.service;
 
+import com.nate.inventorymanagementsystemapi.dto.JwtResponse;
+import com.nate.inventorymanagementsystemapi.dto.LoginDto;
 import com.nate.inventorymanagementsystemapi.dto.RegisterDto;
 import com.nate.inventorymanagementsystemapi.dto.UserDto;
 import com.nate.inventorymanagementsystemapi.exception.UserNotFoundException;
@@ -40,11 +42,7 @@ public class UserService implements IUserService, UserDetailsService {
         User user = new User();
         user.setUsername(registerDto.getUsername());
         user.setPassword(encoder.encode(registerDto.getPassword()));
-        if(registerDto.getEmail().contains("admin")){
-            user.setRole(Role.ADMIN);
-        }else {
-            user.setRole(Role.USER);
-        }
+        user.setRole(Role.USER);
 
         repo.save(user);
 
@@ -66,6 +64,20 @@ public class UserService implements IUserService, UserDetailsService {
         repo.delete(user);
         return true;
     }
+
+    @Override
+    public JwtResponse login(LoginDto loginDto) {
+        CustomerDetails details = (CustomerDetails) loadUserByUsername(loginDto.getUsername());
+
+        if(!encoder.matches(loginDto.getPassword(),details.getPassword())){
+            throw new RuntimeException("Invalid Username or Password");
+        }
+
+        String token = JwtUtil.generateToken(details.getUsername(),details.getUser().getRole());
+
+        return new JwtResponse(token);
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

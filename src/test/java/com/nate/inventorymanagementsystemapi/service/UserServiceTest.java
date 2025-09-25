@@ -66,7 +66,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Register User Test: Success as Admin with admin email")
+    @DisplayName("Register User Test: Success")
     void registerUserTest_SuccessAsAdmin(){
         RegisterDto registerDto = new RegisterDto();
         registerDto.setUsername("test");
@@ -78,7 +78,7 @@ public class UserServiceTest {
 
         assertEquals("test",userDto.getUsername(),"should have the same username");
         assertTrue(encoder.matches("tester123",userDto.getPassword()));
-        assertEquals(Role.ADMIN,userDto.getRole(),"should have the same role");
+        assertEquals(Role.USER,userDto.getRole(),"should have the same role");
 
         verify(repo,atLeast(1)).save(any(User.class));
     }

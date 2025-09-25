@@ -33,4 +33,11 @@ public class ProductMapper {
                 product.getUser() != null ? product.getUser().getId() : null
         );
     }
+
+    public static Product updateEntity(Product product, ProductDto dto){
+        product.setName(dto.getName());
+        product.setQuantity(dto.getQuantity());
+        product.setPrice(dto.getPrice());
+        return product;
+    }
 }
