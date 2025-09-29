@@ -74,16 +74,39 @@ public class UserControllerTest {
         }
 
         @Test
-        void testRegisterUser_FailBadRequest() throws Exception {
-            String reg = """
-                    {
-                    "username" : "tester"
-                    }
-                    """;
+        void testRegisterUser_FailBadRequestNoUsername() throws Exception {
+            RegisterDto reg = new RegisterDto();
+            reg.setPassword("123Pass");
+            reg.setEmail("tester@gmail.com");
             mockMvc.perform(post("/auth/register")
                     .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(reg))
+                            .content(mapper.writeValueAsString(reg)))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void testRegisterUser_FailBadRequestNoPassword() throws Exception {
+            RegisterDto reg = new RegisterDto();
+            reg.setUsername("tester");
+            reg.setEmail("tester@gmail.com");
+            mockMvc.perform(post("/auth/register")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(reg)))
+                    .andExpect(status().isBadRequest());
+        }
+
+
+        @Test
+        void testRegisterUser_FailBadRequestEmail() throws Exception {
+            RegisterDto reg = new RegisterDto();
+            reg.setUsername("tester");
+            reg.setPassword("123Pass");
+            mockMvc.perform(post("/auth/register")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(reg)))
                     .andExpect(status().isBadRequest());
         }
 
@@ -108,16 +131,24 @@ public class UserControllerTest {
         }
 
         @Test
-        void testLogin_FailBadRequest() throws Exception {
-            String log = """
-                    {
-                        "username" : "tester"
-                    }
-                    """;
+        void testLogin_FailBadRequestNoUsername() throws Exception {
+           LoginDto log = new LoginDto();
+           log.setPassword("tester123");
             mockMvc.perform(post("/auth/login")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(log))
+                    .content(mapper.writeValueAsString(log)))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void testLogin_FailBadRequestNoPassword() throws Exception {
+            LoginDto log = new LoginDto();
+            log.setUsername("tester");
+            mockMvc.perform(post("/auth/login")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(log)))
                     .andExpect(status().isBadRequest());
         }
 

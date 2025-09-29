@@ -128,21 +128,49 @@ public class ProductControllerTest {
         }
 
         @Test
-        void testCreateProduct_FailBadRequest() throws Exception {
-
-            String postProduct = """
-                    {
-                        "price": -10
-                    }
-                    """;
+        void testCreateProduct_FailBadRequestNoProductName() throws Exception {
+            PostProduct postProduct = new PostProduct();
+            postProduct.setQuantity(1);
+            postProduct.setPrice(BigDecimal.valueOf(120));
 
             mockMvc.perform(post("/product")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(postProduct))
+                            .content(mapper.writeValueAsString(postProduct)))
                     .andExpect(status().isBadRequest());
 
         }
+
+        @Test
+        void testCreateProduct_FailBadRequestNoPrice() throws Exception {
+            PostProduct postProduct = new PostProduct();
+            postProduct.setName("TV");
+            postProduct.setQuantity(1);
+
+            mockMvc.perform(post("/product")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(postProduct)))
+                    .andExpect(status().isBadRequest());
+
+        }
+
+
+        @Test
+        void testCreateProduct_FailBadRequestNoQuantity() throws Exception {
+            PostProduct postProduct = new PostProduct();
+            postProduct.setName("TV");
+            postProduct.setPrice(BigDecimal.valueOf(100));
+            mockMvc.perform(post("/product")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(postProduct)))
+                    .andExpect(status().isBadRequest());
+
+        }
+
+
+
     }
 
     @DisplayName("Testing Get Product By ID: All results")

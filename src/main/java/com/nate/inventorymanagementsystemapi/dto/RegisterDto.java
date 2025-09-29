@@ -9,10 +9,10 @@ import lombok.Setter;
 
 @AllArgsConstructor @NoArgsConstructor @Setter @Getter
 public class RegisterDto {
-    @NotBlank
+    @NotBlank(message = "Username cannot be empty")
     private String username;
-    @NotBlank
+    @NotBlank(message = "email cannot be empty")
     private String email;
-    @NotEmpty
+    @NotEmpty(message = "Password cannot be empty")
     private String password;
 }
