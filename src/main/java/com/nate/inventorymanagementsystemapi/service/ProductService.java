@@ -94,13 +94,18 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductDto udpateProduct(Long id, ProductDto productUpdate) {
+    public ProductDto udpateProduct(Long id, ProductDto productUpdate,String username) {
+        User user = repoU.findByUsername(username).orElseThrow(()-> new UserNotFoundException(username));
+
 
 
         Product product = repo.findById(id)
                 .orElseThrow(()-> new ProductNotFoundException(id));
 
 
+        if(!product.getUser().getId().equals(user.getId()) && !user.getRole().equals(Role.ADMIN)){
+            throw new AccessDeniedException("Access Denied");
+        }
 
         Product updateProd = ProductMapper.updateEntity(product,productUpdate);
 

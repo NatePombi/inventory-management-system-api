@@ -56,8 +56,8 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Not Found")
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody @Valid ProductDto dto){
-        return ResponseEntity.ok(service.udpateProduct(id,dto));
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody @Valid ProductDto dto, @AuthenticationPrincipal CustomerDetails details){
+        return ResponseEntity.ok(service.udpateProduct(id,dto,details.getUsername()));
     }
 
 

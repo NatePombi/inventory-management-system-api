@@ -219,7 +219,7 @@ public class ProductControllerTest {
         void testUpdateProduct_Success() throws Exception {
             ProductDto productDto = new ProductDto(11L, "Monitor", 2, BigDecimal.valueOf(900), 2L);
 
-            Mockito.when(service.udpateProduct(eq(11L), any(ProductDto.class))).thenReturn(productDto);
+            Mockito.when(service.udpateProduct(eq(11L), any(ProductDto.class),eq("tester"))).thenReturn(productDto);
 
             mockMvc.perform(patch("/product/11")
                             .with(csrf())
@@ -245,7 +245,7 @@ public class ProductControllerTest {
 
         @Test
         void testUpdateProduct_FailAccessDenied() throws Exception {
-            Mockito.when(service.udpateProduct(eq(1L), any(ProductDto.class))).thenThrow(new AccessDeniedException("Forbidden"));
+            Mockito.when(service.udpateProduct(eq(1L), any(ProductDto.class),eq("tester"))).thenThrow(new AccessDeniedException("Forbidden"));
             ProductDto productDto = new ProductDto(1L, "Monitor", 2, BigDecimal.valueOf(900), 2L);
 
             mockMvc.perform(patch("/product/1")
@@ -258,7 +258,7 @@ public class ProductControllerTest {
         @Test
         void testUpdateProduct_FailNotFound() throws Exception {
             ProductDto productDto = new ProductDto(2L, "Monitor", 2, BigDecimal.valueOf(900), 2L);
-            Mockito.when(service.udpateProduct(eq(2L), any(ProductDto.class))).thenThrow(new ProductNotFoundException(2L));
+            Mockito.when(service.udpateProduct(eq(2L), any(ProductDto.class),anyString())).thenThrow(new ProductNotFoundException(2L));
 
             mockMvc.perform(patch("/product/2")
                             .with(csrf())

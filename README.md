@@ -130,3 +130,11 @@ I’m not done yet here’s what I’ll add next:
 ### Status
 
 - This is a work in progress I’m pushing it now so I can keep improving later.
+
+---
+
+##  Postman Collection
+
+You can import the full Postman collection to test the API:
+
+[📥 Download Postman Collection](./docs/postman_collection.json)

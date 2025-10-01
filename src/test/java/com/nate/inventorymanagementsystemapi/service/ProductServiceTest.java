@@ -199,8 +199,9 @@ public class ProductServiceTest {
 
         when(repo.findById(3L)).thenReturn(Optional.of(mockProduct));
         when(repo.save(any(Product.class))).thenReturn(prod);
+        when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
 
-        ProductDto updated = service.udpateProduct(3L,dto);
+        ProductDto updated = service.udpateProduct(3L,dto,mockUser.getUsername());
 
         assertEquals(3L,updated.getId());
         assertEquals("PS5",updated.getName());
@@ -210,14 +211,27 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Update Product Test: Fail")
-    void testUpdateProduct_FailShouldThrowException(){
+    @DisplayName("Update Product Test: Fail, Product Not Found")
+    void testUpdateProduct_FailProductNotFoundShouldThrowException(){
         ProductDto dto = new ProductDto();
+        when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
 
         Exception ex = assertThrows(ProductNotFoundException.class,()->{
-            service.udpateProduct(3L,dto);
+            service.udpateProduct(3L,dto,mockUser.getUsername());
         });
 
         assertTrue(ex.getMessage().contains("3"));
+    }
+
+    @Test
+    @DisplayName("Update Product Test: Fail, User Not Found")
+    void testUpdateProduct_FailUserNotFoundShouldThrowException(){
+        ProductDto dto = new ProductDto();
+
+        Exception ex = assertThrows(UserNotFoundException.class,()->{
+            service.udpateProduct(3L,dto,mockUser.getUsername());
+        });
+
+        assertTrue(ex.getMessage().contains(mockUser.getUsername()));
     }
 }

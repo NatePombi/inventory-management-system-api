@@ -11,6 +11,6 @@ public interface IProductService {
     ProductDto addProduct(PostProduct product, String username);
     ProductDto getProduct(Long id,String username);
     boolean deleteProduct(Long id,String username);
-    ProductDto udpateProduct(Long id, ProductDto productUpdate);
+    ProductDto udpateProduct(Long id, ProductDto productUpdate,String username);
 
 }
