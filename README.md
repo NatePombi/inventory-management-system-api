@@ -43,7 +43,7 @@ Otherwise, you’re assigned USER.
 
 ### Tech Stack
 
-* Java 21
+* Java 17
 
 * Spring Boot 3
 
@@ -52,6 +52,7 @@ Otherwise, you’re assigned USER.
 * Spring Data JPA
 
 * MySQL
+* PostgreSQL
 
 * JUnit & Mockito for testing
 
@@ -79,11 +80,11 @@ I’m not done yet here’s what I’ll add next:
 
 ### Database Configuration
 
-- This project uses MySQL. Configure it in application.properties.
+- This project uses PostgreSQl. Configure it in application.properties.
 
 - Steps to set up the database:
 
-  - Make sure MySQL is installed and running.
+  - Make sure PostgreSQL is installed and running.
 
   - Create the database:
 
