@@ -16,11 +16,6 @@ Right now it’s fully functional, but I’ll keep improving it over time.
 
 * Role-based access control (User vs Admin).
 
-* Role assignment is determined by email:
-
-* If your email contains “admin”, you’re assigned ADMIN.
-Otherwise, you’re assigned USER.
-
 * Product Management (CRUD):
 
   * Create products
