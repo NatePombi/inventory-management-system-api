@@ -80,7 +80,12 @@ I’m not done yet here’s what I’ll add next:
 
 ### Database Configuration
 
-- This project uses PostgreSQl. Configure it in application.properties.
+- This project uses PostgreSQl. Configure it in edit Configurations.
+
+      1.Go to run
+      2.Go to edit Configurations
+      3.in the Application drop down go to InventoryManagementSystemApiApplication
+      4.Then go to environment varaibles and configure it to your custom details
 
 - Steps to set up the database:
 
@@ -91,7 +96,7 @@ I’m not done yet here’s what I’ll add next:
     - CREATE DATABASE inventoryAPI;
     - Update the username and password in application.properties to your own.
     - When you run the Spring Boot app, JPA/Hibernate will automatically create/update tables.
-    - 
+    
 
 
 ---
@@ -116,15 +121,6 @@ I’m not done yet here’s what I’ll add next:
 4) Open Swagger docs in browser:
 
 - http://localhost:8080/swagger-ui/index.html
-
----
-## Note on Roles
-
-- When you register a new account:
-
-  - If your email contains “admin”, the system automatically gives you the ADMIN role.
-
-  - Otherwise, you’ll be a USER by default.
 
 ---
 
