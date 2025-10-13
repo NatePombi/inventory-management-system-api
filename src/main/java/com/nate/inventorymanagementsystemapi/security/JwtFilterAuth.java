@@ -21,17 +21,27 @@ import java.io.IOException;
 public class JwtFilterAuth extends OncePerRequestFilter {
 
     private final UserDetailsService service;
+    private static final String[] EXCLUDED_PATHS = {
+            "/auth/login",
+            "/auth/register",
+            "/swagger-ui",
+            "/swagger-ui/",
+            "/swagger-ui.html",
+            "/swagger-ui/index.html",
+            "/v3/api-docs",
+            "/v3/api-docs/",
+            "/swagger-resources",
+            "/swagger-resources/",
+            "/webjars/"
+    };
+
 
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getServletPath();
-        if(path.startsWith("/auth/login") || path.startsWith("/auth/register") ||
-            path.startsWith("/swagger-ui") ||
-            path.startsWith("/v3/api-docs") ||
-            path.startsWith("/swagger-resources") ||
-            path.startsWith("/webjars")){
+        if(isExcluded(path)){
             filterChain.doFilter(request,response);
             return;
         }
@@ -59,4 +69,14 @@ public class JwtFilterAuth extends OncePerRequestFilter {
         filterChain.doFilter(request,response);
 
     }
+
+    private boolean isExcluded(String path) {
+        for (String exclude : EXCLUDED_PATHS) {
+            if (path.startsWith(exclude)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
