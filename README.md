@@ -108,9 +108,7 @@ DB_PASSWORD=yourpassword
     - Update the username and password in application.properties to your own.
     - When you run the Spring Boot app, JPA/Hibernate will automatically create/update tables.
     
-
-
----
+  
 
 ---
 ### Admin Seeding
@@ -130,7 +128,7 @@ DB_PASSWORD=yourpassword
 
 1) Clone the repo
 
-- git clone https://github.com/NatePombi/java-projects.git
+- git clone https://github.com/NatePombi/inventory-management-system-api
 
 
 2) Navigate into the project
