@@ -72,7 +72,7 @@ public class JwtFilterAuth extends OncePerRequestFilter {
 
     private boolean isExcluded(String path) {
         for (String exclude : EXCLUDED_PATHS) {
-            if (path.startsWith(exclude)) {
+            if (path.contains(exclude)) {
                 return true;
             }
         }
