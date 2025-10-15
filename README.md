@@ -38,20 +38,22 @@ Right now it’s fully functional, but I’ll keep improving it over time.
 
 ### Tech Stack
 
-* Java 17
+* ![Java](https://img.shields.io/badge/Java-17-blue)
 
-* Spring Boot 3
+* ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3-green)
 
-* Spring Security with JWT
+* ![Spring Security](https://img.shields.io/badge/Security-JWT-yellow)
 
-* Spring Data JPA
+* ![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-3-brightgreen?logo=spring&logoColor=white)
 
-* MySQL
-* PostgreSQL
+* ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-DB-blue)
 
-* JUnit & Mockito for testing
+* ![JUnit](https://img.shields.io/badge/Testing-JUnit%20%26%20Mockito-orange)
 
-* Swagger / OpenAPI for API docs
+* ![Swagger](https://img.shields.io/badge/Docs-Swagger-brightgreen)
+* ![H2 Database](https://img.shields.io/badge/H2-Database-blue?logo=h2&logoColor=white)
+
+
 
 ---
 
@@ -63,8 +65,6 @@ I’m not done yet here’s what I’ll add next:
 
 * Timestamps (createdAt, updatedAt) for products
 
-* Integration tests with MySQL DB
-
 * Docker & Docker Compose (with Postgres)
 
 * Deploy online (Railway/Render/Heroku) for live demo
@@ -72,15 +72,31 @@ I’m not done yet here’s what I’ll add next:
 * Analytics dashboard (product stock levels, sales trends, etc.)
 
 --- 
+### Environment Variable
+
+This project use a '.env' file to store configuration values the database, there is a template named "envtemplate.env.example" showing you exactly how it should look like.
+
+Create a '.env' file in the **project root**:
+
+```env
+
+DB_URL=jdbc:postgresql://localhost:5432/InventoryAPI
+
+DB_USERNAME=yourusername 
+
+DB_PASSWORD=yourpassword
+```
+---
+
 
 ### Database Configuration
 
-- This project uses PostgreSQl. Configure it in edit Configurations.
+- This project uses PostgreSQl.
 
-      1.Go to run
-      2.Go to edit Configurations
-      3.in the Application drop down go to InventoryManagementSystemApiApplication
-      4.Then go to environment varaibles and configure it to your custom details
+      1. Go to your .env file in your project root. 
+      2. Configure the database details to your custom details.
+      3. Go to Run -> Edit Connfiguration -> Environment Variables
+      4. Enable your .env file ( use the EnvFile plugin)
 
 - Steps to set up the database:
 
@@ -95,6 +111,20 @@ I’m not done yet here’s what I’ll add next:
 
 
 ---
+
+---
+### Admin Seeding
+
+- Admin User (Seeded on Runtime)
+  - For testing and management purposes, the application automatically creates and admin user when applications starts. This ensures that theres always at least one admin present.
+
+  - Credentials:
+    ```json
+    {
+      "username": "admin",
+      "password": "admin123"
+    }
+
 
 ### How to Use (For Now)
 
@@ -117,11 +147,13 @@ I’m not done yet here’s what I’ll add next:
 
 - http://localhost:8080/swagger-ui/index.html
 
+
+
 ---
 
 ### Status
 
-- This is a work in progress I’m pushing it now so I can keep improving later.
+- This project is actively maintained and open for improvements and contributions.
 
 ---
 
@@ -130,3 +162,56 @@ I’m not done yet here’s what I’ll add next:
 You can import the full Postman collection to test the API:
 
 [📥 Download Postman Collection](./docs/postman_collection.json)
+
+---
+### Swagger Ui
+You can explore swagger UI here :  [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+
+![Swagger Screenshot UI1](./docs/swagger_ui1.png)
+![Swagger Screenshot UI2](./docs/swagger_ui2.png)
+
+
+--
+### Sample API calls
+
+Register User
+**POST** `/auth/register`
+```json
+{
+  "username": "john",
+  "email": "john@gmail.com",
+  "password": "pass123"
+}
+```
+
+Login User
+**POST** `/auth/login`
+```json
+{
+  "username": "john_doe",
+  "password": "password123"
+}
+```
+
+Create Product
+**POST** `/api/products`
+```json
+{
+  "name": "Laptop",
+  "description": "HP Pavilion 15",
+  "price": 14999.99,
+  "quantity": 10
+}
+```
+
+Response:
+```json
+{
+  "id": 1,
+  "name": "Laptop",
+  "price": 14999.99,
+  "quantity": 10
+}
+```
+
+
