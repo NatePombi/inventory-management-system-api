@@ -21,10 +21,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -52,10 +54,14 @@ public class ProductControllerIntegrationTest {
 
 
     private User testUser;
+    private User testUser2;
+
 
     private String token;
 
     private Product testProduct;
+    private Product testProduct2;
+
 
 
     @BeforeEach
@@ -66,7 +72,13 @@ public class ProductControllerIntegrationTest {
         testUser.setRole(Role.USER);
         testUser.setPassword(encoder.encode("tester123"));
 
+        testUser2 = new User();
+        testUser2.setUsername("tester2");
+        testUser2.setRole(Role.ADMIN);
+        testUser2.setPassword(encoder.encode("tester123"));
+
         repo.save(testUser);
+        repo.save(testUser2);
 
         testProduct = new Product();
         testProduct.setQuantity(4);
@@ -74,7 +86,14 @@ public class ProductControllerIntegrationTest {
         testProduct.setPrice(BigDecimal.valueOf(300));
         testProduct.setName("Laptop");
 
+        testProduct2 = new Product();
+        testProduct2.setQuantity(4);
+        testProduct2.setPrice(BigDecimal.valueOf(300));
+        testProduct2.setName("Laptop");
+        testProduct2.setUser(testUser2);
+
         repository.save(testProduct);
+        repository.save(testProduct2);
 
          token = JwtUtil.generateToken(testUser.getUsername(),testUser.getRole());
 
@@ -100,6 +119,7 @@ public class ProductControllerIntegrationTest {
                     .andExpect(jsonPath("$.quantity").value(3))
                     .andExpect(jsonPath("$.price").value(100));
 
+            assertTrue(repository.findById(3L).isPresent());
         }
 
         @Test
@@ -113,7 +133,6 @@ public class ProductControllerIntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(mapper.writeValueAsString(postProduct)))
                     .andExpect(status().isBadRequest());
-
         }
 
         @Test
@@ -125,6 +144,18 @@ public class ProductControllerIntegrationTest {
                             .content(mapper.writeValueAsString(postProduct)))
                     .andExpect(status().isUnauthorized());
 
+        }
+
+        @Test
+        void testCreateProduct_FailInvalidToken() throws Exception {
+            PostProduct postProduct = new PostProduct("TV", 3, BigDecimal.valueOf(100));
+
+
+            mvc.perform(post("/product")
+                            .header("Authorization", "Bearer Invalid-Token")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(postProduct)))
+                    .andExpect(status().isUnauthorized());
         }
     }
 
@@ -144,7 +175,7 @@ public class ProductControllerIntegrationTest {
 
         @Test
         void testGetProductByID_FailNotFound() throws Exception {
-            mvc.perform(get("/product/2")
+            mvc.perform(get("/product/5")
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound());
         }
@@ -154,6 +185,24 @@ public class ProductControllerIntegrationTest {
             mvc.perform(get("/product/Not-Valid-ID")
                     .header("Authorization", "Bearer " + token))
                     .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void testGetProductByID_Unauthorized() throws Exception {
+            mvc.perform(get("/product/2")
+                    .header("Authorization", "Bearer "+token))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void testGetProductById_SuccessAdmin() throws Exception {
+            String token2 = JwtUtil.generateToken(testUser2.getUsername(),testUser2.getRole());
+            mvc.perform(get("/product/1")
+                    .header("Authorization", "Bearer " + token2))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name").value("Laptop"))
+                    .andExpect(jsonPath("$.price").value(300))
+                    .andExpect(jsonPath("$.quantity").value(4));
         }
     }
 
@@ -186,11 +235,38 @@ public class ProductControllerIntegrationTest {
         void testUpdateProduct_FailNotFound() throws Exception {
             PostProduct postProduct = new PostProduct("Laptop",11,BigDecimal.valueOf(700));
 
-            mvc.perform(patch("/product/1")
+            mvc.perform(patch("/product/3")
                             .header("Authorization", "Bearer "+token)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(mapper.writeValueAsString(postProduct)))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void testUpdateProduct_FailUnauthorized() throws Exception {
+            PostProduct postProduct = new PostProduct("Laptop",11,BigDecimal.valueOf(700));
+
+
+            mvc.perform(patch("/product/2")
+                            .header("Authorization", "Bearer "+token)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(postProduct)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void testUpdateProduct_SuccessAdmin() throws Exception {
+            PostProduct postProduct = new PostProduct("Laptop",11,BigDecimal.valueOf(700));
+            String token2 = JwtUtil.generateToken(testUser2.getUsername(),testUser2.getRole());
+
+            mvc.perform(patch("/product/1")
+                            .header("Authorization", "Bearer "+token2)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(postProduct)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name").value("Laptop"))
+                    .andExpect(jsonPath("$.quantity").value(11))
+                    .andExpect(jsonPath("$.price").value(700));
         }
     }
 
@@ -206,12 +282,14 @@ public class ProductControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(content().string("true"));
 
+            assertFalse(repository.findById(1L).isPresent());
+
         }
 
         @Test
         void testDeleteProduct_FailNotFound() throws Exception {
 
-            mvc.perform(delete("/product/2")
+            mvc.perform(delete("/product/4")
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isNotFound());
 
@@ -224,6 +302,23 @@ public class ProductControllerIntegrationTest {
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isBadRequest());
 
+        }
+
+        @Test
+        void testDeleteProduct_FailUnauthorized() throws Exception {
+            mvc.perform(delete("/product/2")
+                    .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void testDeleteProduct_SuccessAdmin() throws Exception {
+            String token2 = JwtUtil.generateToken(testUser2.getUsername(),testUser2.getRole());
+            mvc.perform(delete("/product/1")
+                            .header("Authorization", "Bearer " + token2))
+                    .andExpect(status().isOk());
+
+            assertFalse(repository.findById(1L).isPresent());
         }
     }
 }
