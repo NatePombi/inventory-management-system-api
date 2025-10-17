@@ -1,5 +1,6 @@
 package com.nate.inventorymanagementsystemapi.controller;
 
+import com.nate.inventorymanagementsystemapi.dto.PaginatedResponse;
 import com.nate.inventorymanagementsystemapi.dto.PostProduct;
 import com.nate.inventorymanagementsystemapi.dto.ProductDto;
 import com.nate.inventorymanagementsystemapi.model.CustomerDetails;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -73,8 +75,25 @@ public class ProductController {
         return ResponseEntity.ok(service.deleteProduct(id, customerDetails.getUsername()));
     }
 
+
     @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProductsByUser(@AuthenticationPrincipal CustomerDetails customerDetails){
-        return ResponseEntity.ok(service.getAllUserProductsByUsername(customerDetails.getUsername()));
+    public ResponseEntity<PaginatedResponse<ProductDto>> getAllProductsByUser(@AuthenticationPrincipal CustomerDetails customerDetails,
+                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "5") int size,
+                                                                  @RequestParam(defaultValue = "name") String sortBy,
+                                                                  @RequestParam(defaultValue = "asc") String direction){
+
+        Page<ProductDto> productDtoPage = service.getAllUserProductsByUsername(customerDetails.getUsername(),page,size,sortBy,direction);
+
+        PaginatedResponse<ProductDto> response = new PaginatedResponse<>(
+                productDtoPage.getContent(),
+                productDtoPage.getNumber(),
+                productDtoPage.getTotalPages(),
+                productDtoPage.getTotalElements(),
+                productDtoPage.isLast()
+        );
+
+        return ResponseEntity.ok().body(response);
+
     }
 }

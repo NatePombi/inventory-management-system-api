@@ -1,10 +1,7 @@
 package com.nate.inventorymanagementsystemapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nate.inventorymanagementsystemapi.dto.JwtResponse;
-import com.nate.inventorymanagementsystemapi.dto.LoginDto;
-import com.nate.inventorymanagementsystemapi.dto.RegisterDto;
-import com.nate.inventorymanagementsystemapi.dto.UserDto;
+import com.nate.inventorymanagementsystemapi.dto.*;
 import com.nate.inventorymanagementsystemapi.exception.UserNotFoundException;
 import com.nate.inventorymanagementsystemapi.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +17,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -209,9 +208,14 @@ public class UserControllerTest {
 
         @Test
         void testGetUsers_Success() throws Exception {
-            Mockito.when(service.getUsers()).thenReturn(List.of());
+            Page<UserDto> page = new PageImpl<>(List.of());
+            Mockito.when(service.getUsers(0,5,"username","desc")).thenReturn(page);
 
             mockMvc.perform(get("/auth")
+                            .param("page","0")
+                            .param("size","5")
+                            .param("sortBy","username")
+                            .param("direction","desc")
                             .with(csrf()))
                     .andExpect(status().isOk());
         }

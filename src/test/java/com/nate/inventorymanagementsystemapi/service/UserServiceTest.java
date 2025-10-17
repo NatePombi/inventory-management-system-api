@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -120,22 +121,27 @@ public class UserServiceTest {
         User user1 = mock(User.class);
         User user2 = mock(User.class);
 
-        when(repo.findAll()).thenReturn(List.of(mockUser,user2,user1));
+        Pageable pageable = PageRequest.of(0,5,Sort.by("name").descending());
+        Page<User> userPage = new PageImpl<>(List.of(mockUser,user2,user1));
 
-        List<UserDto> dtos = service.getUsers();
+        when(repo.findAll(pageable)).thenReturn(userPage);
 
-        assertEquals(3,dtos.size(),"should have a number of 3 Users");
+        Page<UserDto> dtos = service.getUsers(0,5,"name","desc");
+
+        assertEquals(3,dtos.getContent().size(),"should have a number of 3 Users");
 
     }
 
     @Test
     @DisplayName("Get Users Test: with no users present")
     void getUsersTestWithNoUsers(){
-        when(repo.findAll()).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0,5,Sort.by("name").descending());
+        Page<User> userPage = new PageImpl<>(List.of());
+        when(repo.findAll(pageable)).thenReturn(userPage);
 
-        List<UserDto> dtos = service.getUsers();
+        Page<UserDto> dtos = service.getUsers(0,5,"name","desc");
 
-        assertEquals(0,dtos.size(),"should have no users");
+        assertEquals(0,dtos.getContent().size(),"should have no users");
 
     }
 

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.convert.DataSizeUnit;
+import org.springframework.data.domain.*;
 import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
@@ -59,23 +60,30 @@ public class ProductServiceTest {
     @DisplayName("Get all User Product by Username Test: Success")
     void testGetAllUserProductByUsername_Success(){
         Product prod = mock(Product.class);
+        Pageable pageable = PageRequest.of(0,5, Sort.by("name").descending());
+        Page<Product> productPage = new PageImpl<>(List.of(mockProduct,prod));
+
         when(prod.getUser()).thenReturn(mockUser);
-        when(repo.findAll()).thenReturn(List.of(mockProduct,prod));
+        when(repo.findByUserUsername("Tester",pageable)).thenReturn(productPage);
         when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
 
-        List<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester");
+        Page<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester",0,5,"name","desc");
 
         assertNotNull(productDtos);
 
-        assertEquals(2, productDtos.size(),"Should have 2 products present");
+
+        assertEquals(2, productDtos.getContent().size(),"Should have 2 products present");
     }
+
 
     @Test
     @DisplayName("Get all User Product by Username Test: No Items present")
     void testGetAllUserProductByUsername_NoItemsPresent(){
-
+        Pageable pageable = PageRequest.of(0,5,Sort.by("name").ascending());
+        Page<Product> productPage = new PageImpl<>(List.of());
         when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
-        List<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester");
+        when(repo.findByUserUsername("Tester",pageable)).thenReturn(productPage);
+        Page<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester",0,5,"name","asc");
 
         assertTrue(productDtos.isEmpty(),"Should be empty");
     }

@@ -3,6 +3,7 @@ package com.nate.inventorymanagementsystemapi.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nate.inventorymanagementsystemapi.dto.PostProduct;
+import com.nate.inventorymanagementsystemapi.dto.ProductDto;
 import com.nate.inventorymanagementsystemapi.dto.RegisterDto;
 import com.nate.inventorymanagementsystemapi.model.Product;
 import com.nate.inventorymanagementsystemapi.model.Role;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
@@ -25,8 +28,11 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -203,6 +209,21 @@ public class ProductControllerIntegrationTest {
                     .andExpect(jsonPath("$.name").value("Laptop"))
                     .andExpect(jsonPath("$.price").value(300))
                     .andExpect(jsonPath("$.quantity").value(4));
+        }
+    }
+
+    @DisplayName("Testing Get All Products of User: All results")
+    @Nested
+    class TestGetAllUserProduct {
+        @Test
+        void testGetAllUserProduct_Success() throws Exception {
+            mvc.perform(get("/product")
+                    .param("page","0")
+                    .param("size","5")
+                    .param("sortBy","name")
+                    .param("direction","desc")
+                    .header("Authorization", "Bearer "+token))
+                    .andExpect(status().isOk());
         }
     }
 

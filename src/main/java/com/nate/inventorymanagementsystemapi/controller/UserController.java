@@ -1,8 +1,6 @@
 package com.nate.inventorymanagementsystemapi.controller;
 
-import com.nate.inventorymanagementsystemapi.dto.LoginDto;
-import com.nate.inventorymanagementsystemapi.dto.RegisterDto;
-import com.nate.inventorymanagementsystemapi.dto.UserDto;
+import com.nate.inventorymanagementsystemapi.dto.*;
 import com.nate.inventorymanagementsystemapi.exception.UserNotFoundException;
 import com.nate.inventorymanagementsystemapi.model.User;
 import com.nate.inventorymanagementsystemapi.service.IUserService;
@@ -12,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -80,8 +79,22 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<UserDto>> getUsers(){
-        return ResponseEntity.ok(service.getUsers());
+    public ResponseEntity<PaginatedResponse<UserDto>> getUsers(@RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "5") int size,
+                                                  @RequestParam(defaultValue = "name") String sortBy,
+                                                  @RequestParam(defaultValue = "desc") String direction){
+        Page<UserDto> userDtoPage = service.getUsers(page, size, sortBy, direction);
+
+        PaginatedResponse<UserDto> response = new PaginatedResponse<>(
+              userDtoPage.getContent(),
+              userDtoPage.getNumber(),
+              userDtoPage.getTotalPages(),
+                userDtoPage.getTotalElements(),
+                userDtoPage.isFirst()
+        );
+
+
+        return ResponseEntity.ok().body(response);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

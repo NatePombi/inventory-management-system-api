@@ -12,6 +12,10 @@ import com.nate.inventorymanagementsystemapi.model.User;
 import com.nate.inventorymanagementsystemapi.repository.UserRepository;
 import com.nate.inventorymanagementsystemapi.util.JwtUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -50,10 +54,15 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public List<UserDto> getUsers() {
-        return repo.findAll().stream()
-                .map(UserMapper::toDto)
-                .toList();
+    public Page<UserDto> getUsers(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        Page<User> userPage = repo.findAll(pageable);
+
+        return userPage.map(UserMapper::toDto);
+
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.nate.inventorymanagementsystemapi.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nate.inventorymanagementsystemapi.dto.PostProduct;
 import com.nate.inventorymanagementsystemapi.dto.ProductDto;
+import com.nate.inventorymanagementsystemapi.dto.UserDto;
 import com.nate.inventorymanagementsystemapi.exception.ProductNotFoundException;
 import com.nate.inventorymanagementsystemapi.model.CustomerDetails;
 import com.nate.inventorymanagementsystemapi.security.JwtFilterAuth;
@@ -21,6 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,6 +37,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -210,6 +214,34 @@ public class ProductControllerTest {
                             .with(csrf()))
                     .andExpect(status().isForbidden());
         }
+    }
+
+    @DisplayName("Testing Get All Products of User: All results")
+    @Nested
+    class TestGetAllUserProduct {
+        @Test
+        void testGetAllUserProduct_Success() throws Exception {
+            ProductDto productDto = new ProductDto();
+            ProductDto productDto2 = new ProductDto();
+            ProductDto productDto3= new ProductDto();
+
+
+            Page<ProductDto> page = new PageImpl<>(List.of(productDto,productDto2,productDto3));
+
+            when(service.getAllUserProductsByUsername("tester",0,5,"name","desc")).thenReturn(page);
+
+            mockMvc.perform(get("/product")
+                            .param("page", "0")
+                            .param("size", "5")
+                            .param("sortBy", "name")
+                            .param("direction", "desc")
+                    .header("Authorization", "Bearer Fake-jwt-token")
+                    .with(csrf()))
+                    .andExpect(status().isOk());
+
+
+        }
+
     }
 
 
