@@ -59,10 +59,6 @@ Right now it’s fully functional, but I’ll keep improving it over time.
 
 ### Future Plans
 
-I’m not done yet here’s what I’ll add next:
-
-*  Pagination & sorting for product listings
-
 * Timestamps (createdAt, updatedAt) for products
 
 * Docker & Docker Compose (with Postgres)
