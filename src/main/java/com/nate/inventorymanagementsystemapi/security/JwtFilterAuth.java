@@ -2,6 +2,7 @@ package com.nate.inventorymanagementsystemapi.security;
 
 import com.nate.inventorymanagementsystemapi.model.CustomerDetails;
 import com.nate.inventorymanagementsystemapi.util.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,9 +56,7 @@ public class JwtFilterAuth extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
         if(!JwtUtil.tokenValidation(token)){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid or Expired token");
-            return;
+            throw new JwtException("Invalid or expired JWT token");
         }
 
         CustomerDetails customerDetails = (CustomerDetails) service.loadUserByUsername(JwtUtil.extractUsername(token));

@@ -1,5 +1,6 @@
 package com.nate.inventorymanagementsystemapi.exception;
 
+import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import java.time.Instant;
 public class GlobalExceptionHandler {
     record ApiError(Instant timestamp, int status,String error, String message, String path){}
 
+
     @ExceptionHandler(ProductNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleProductNotFound(ProductNotFoundException ex, jakarta.servlet.http.HttpServletRequest req){
@@ -34,6 +36,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiError handleAccessDenied(AccessDeniedException ex, jakarta.servlet.http.HttpServletRequest req){
         return new ApiError(Instant.now(),403,"Forbidden",ex.getMessage(),req.getRequestURI());
+    }
+
+    @ExceptionHandler(io.jsonwebtoken.JwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleJwtException(JwtException ex, jakarta.servlet.http.HttpServletRequest req){
+        return new ApiError(Instant.now(),401,"Unauthorized", ex.getMessage(), req.getRequestURI());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
