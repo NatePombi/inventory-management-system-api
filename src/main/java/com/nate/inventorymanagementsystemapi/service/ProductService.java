@@ -11,6 +11,8 @@ import com.nate.inventorymanagementsystemapi.model.User;
 import com.nate.inventorymanagementsystemapi.repository.ProductRepository;
 import com.nate.inventorymanagementsystemapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ import java.util.List;
 @Service
 public class ProductService implements IProductService {
 
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository repo;
     private final UserRepository repoU;
 
@@ -36,13 +39,17 @@ public class ProductService implements IProductService {
      * @param size  the amount of items per page
      * @param sortBy the field the page is sorted by (e.g name, quantity etc)
      * @param direction the way the pages are sorted (e.g asc or desc)
-     * @return a paginated page of {@link Page} of {@link ProductDto} objects
+     * @return a paginated page {@link Page} of {@link ProductDto} objects
      * @throws UserNotFoundException if no user was found with the given username
      */
     @Override
     public Page<ProductDto> getAllUserProductsByUsername(String username, int page, int size, String sortBy, String direction) {
+        log.info("Fetching products for user: {}, page {}, size {}, sortBy {}, direction {} ",username,page,size,sortBy,direction);
         //Finds user by username, throws exception if not found
-       User user = repoU.findByUsername(username).orElseThrow(()-> new UserNotFoundException(username));
+       User user = repoU.findByUsername(username).orElseThrow(()->{
+            log.error("User not found: {}",username);
+            return new UserNotFoundException(username);
+       });
 
        //Configures sorting (ascending or descending)
        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
@@ -52,6 +59,7 @@ public class ProductService implements IProductService {
 
         //Fetches Paginated product data for the given user
         Page<Product> productPage = repo.findByUserUsername(username,pageable);
+        log.debug("Found {} products for user {}",productPage.getTotalElements(),username);
 
         //if user is Admin, fetches product regardless
         if (user.getRole().equals(Role.ADMIN)) {
@@ -63,18 +71,22 @@ public class ProductService implements IProductService {
     }
 
     /**
-     * Creates a new Product
+     * Add a new Product
      *
-     * @param product product thats given by client to create
+     * @param product product thats given by client to Add
      * @param username username of logged in user
      * @return a {@link ProductDto} object
      * @throws UserNotFoundException if user with given username not found
      */
     @Override
     public ProductDto addProduct(PostProduct product, String username) {
+        log.info("Adding new product: {}",product.getName());
         //Finds user by username, throws exception if not found
         User user = repoU.findByUsername(username)
-                .orElseThrow(()-> new UserNotFoundException(username));
+                .orElseThrow(()->{
+                    log.error("User not found: {}",username);
+                    return new UserNotFoundException(username);
+                });
 
         //Creates a ProductDto to store the data retrieved from user
         ProductDto dto = new ProductDto();
@@ -86,6 +98,7 @@ public class ProductService implements IProductService {
         Product product1 = ProductMapper.toEntity(dto,user);
         //Saves the Product entity to the repo
         Product saved = repo.save(product1);
+        log.debug("Saves product id {} to repo",saved.getName());
 
         //Map the Product entity to ProductDto object using the mapper
         return ProductMapper.toDto(saved);
@@ -103,16 +116,24 @@ public class ProductService implements IProductService {
      */
     @Override
     public ProductDto getProduct(Long id,String username) {
+        log.info("Fetching product with id: {}",id);
         //Fetches the user by username, throws exception if not found
         User user = repoU.findByUsername(username)
-                .orElseThrow(()->new UserNotFoundException(username));
+                .orElseThrow(()->{
+                    log.error("User not found: {}",username);
+                   return new UserNotFoundException(username);
+                });
 
         //Fetches Product by id , throws exception if not found
         Product product = repo.findById(id)
-                .orElseThrow(()-> new ProductNotFoundException(id));
+                .orElseThrow(()-> {
+                    log.error("Product not found id: {}",id);
+                    return new ProductNotFoundException(id);
+                });
 
         //if User is not owner of product or is not admin, throws exception
         if(!product.getUser().getId().equals(user.getId()) && !user.getRole().equals(Role.ADMIN)){
+            log.error("Unauthorized access for this product id: {}",id);
             throw new AccessDeniedException("Not Authorized");
         }
 
@@ -132,26 +153,36 @@ public class ProductService implements IProductService {
      */
     @Override
     public boolean deleteProduct(Long id, String username) {
+        log.error("Deleting product id: {}",id);
         //Fetches user by username ,throws exception if not found
         User user = repoU.findByUsername(username)
-                .orElseThrow(()-> new UserNotFoundException(username));
+                .orElseThrow(()->{
+                    log.error("User not found: {}",username);
+                    return new UserNotFoundException(username);
+                });
 
         //Fetches Product by id , throws exception if not found
         Product product = repo.findById(id)
-                .orElseThrow(()-> new ProductNotFoundException(id));
+                .orElseThrow(()-> {
+                    log.error("Product not found id: {}",id);
+                    return new ProductNotFoundException(id);
+                });
 
         //If User is admin, deletes product regardless of ownership
         if (user.getRole().equals(Role.ADMIN)) {
+            log.debug("Admin: Found and deleting product id: {}",id);
             repo.delete(product);
             return true;
         }
         //if User is owner, deletes product
         else if (product.getUser().getId().equals(user.getId())) {
+            log.debug("User: Found and deleting product id: {}", id);
             repo.delete(product);
             return true;
         }
 
         //if User is not owner of product or not an admin, throws exception
+        log.error("Unauthorized access for product id: {}",id);
         throw new AccessDeniedException("Dont have Authorization");
     }
 
@@ -168,15 +199,23 @@ public class ProductService implements IProductService {
      */
     @Override
     public ProductDto udpateProduct(Long id, ProductDto productUpdate,String username) {
+        log.error("Updating product id: {}",id);
         //Fetches user by username, throws exception if not found
-        User user = repoU.findByUsername(username).orElseThrow(()-> new UserNotFoundException(username));
+        User user = repoU.findByUsername(username).orElseThrow(()-> {
+            log.error("User not found: {}",username);
+            return new UserNotFoundException(username);
+        });
 
         //Fetches product by id , throws exception id if not found
         Product product = repo.findById(id)
-                .orElseThrow(()-> new ProductNotFoundException(id));
+                .orElseThrow(()-> {
+                    log.error("Product not found id: {}",id);
+                    return new ProductNotFoundException(id);
+                });
 
         //if User is not owner of product or not admin, throws exception
         if(!product.getUser().getId().equals(user.getId()) && !user.getRole().equals(Role.ADMIN)){
+            log.error("Unauthorized access for product id: {}",id);
             throw new AccessDeniedException("Access Denied");
         }
 
@@ -184,6 +223,7 @@ public class ProductService implements IProductService {
         Product updateProd = ProductMapper.updateEntity(product,productUpdate);
 
         //Saves Product to repo
+        log.debug("Found and saving product id: {}",id);
         repo.save(updateProd);
 
         //Map Product entity to ProductDto Object using mapper
