@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
         return new ApiError(Instant.now(),403,"Forbidden",ex.getMessage(),req.getRequestURI());
     }
 
-    @ExceptionHandler(io.jsonwebtoken.JwtException.class)
+    @ExceptionHandler(JwtException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiError handleJwtException(JwtException ex, jakarta.servlet.http.HttpServletRequest req){
         return new ApiError(Instant.now(),401,"Unauthorized", ex.getMessage(), req.getRequestURI());

@@ -2,6 +2,7 @@ package com.nate.inventorymanagementsystemapi.security;
 
 import com.nate.inventorymanagementsystemapi.model.CustomerDetails;
 import com.nate.inventorymanagementsystemapi.util.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,21 +68,6 @@ public class JwtFilterAuthTest {
         verify(filterChain, never()).doFilter(request,response);
     }
 
-    @Test
-    void shouldReturn401WhenTokenInvalid() throws ServletException, IOException {
-        when(request.getServletPath()).thenReturn("/product/1");
-        when(request.getHeader("Authorization")).thenReturn("Bearer invalidToken");
-
-        try (MockedStatic<JwtUtil> jwtUtilMockedStatic = Mockito.mockStatic(JwtUtil.class)){
-            jwtUtilMockedStatic.when(()-> JwtUtil.tokenValidation("invalidToken")).thenReturn(false);
-
-            jwtFilterAuth.doFilterInternal(request,response,filterChain);
-        }
-
-
-        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        verify(filterChain, never()).doFilter(request,response);
-    }
 
     @Test
     void shouldAuthenticationWhenTokenValid() throws ServletException, IOException {

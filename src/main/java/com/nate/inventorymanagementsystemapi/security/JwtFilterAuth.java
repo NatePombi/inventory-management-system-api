@@ -55,8 +55,11 @@ public class JwtFilterAuth extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
+
         if(!JwtUtil.tokenValidation(token)){
-            throw new JwtException("Invalid or expired JWT token");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid or Expired token");
+            return;
         }
 
         CustomerDetails customerDetails = (CustomerDetails) service.loadUserByUsername(JwtUtil.extractUsername(token));
