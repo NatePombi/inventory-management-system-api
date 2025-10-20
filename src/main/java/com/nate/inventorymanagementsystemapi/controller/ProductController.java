@@ -81,9 +81,10 @@ public class ProductController {
                                                                   @RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "5") int size,
                                                                   @RequestParam(defaultValue = "name") String sortBy,
-                                                                  @RequestParam(defaultValue = "asc") String direction){
+                                                                  @RequestParam(defaultValue = "asc") String direction,
+                                                                  @RequestParam(required = false) String search){
 
-        Page<ProductDto> productDtoPage = service.getAllUserProductsByUsername(customerDetails.getUsername(),page,size,sortBy,direction);
+        Page<ProductDto> productDtoPage = service.getAllUserProductsByUsername(customerDetails.getUsername(),page,size,sortBy,direction,search);
 
         PaginatedResponse<ProductDto> response = new PaginatedResponse<>(
                 productDtoPage.getContent(),

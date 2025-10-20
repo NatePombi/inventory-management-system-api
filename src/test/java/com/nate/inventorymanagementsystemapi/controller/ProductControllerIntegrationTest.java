@@ -225,6 +225,31 @@ public class ProductControllerIntegrationTest {
                     .header("Authorization", "Bearer "+token))
                     .andExpect(status().isOk());
         }
+
+        @Test
+        void testGetAllUserProduct_SuccessSearchByName() throws Exception {
+            mvc.perform(get("/product")
+                            .param("page","0")
+                            .param("size","5")
+                            .param("sortBy","name")
+                            .param("direction","desc")
+                            .param("search","Laptop")
+                            .header("Authorization", "Bearer "+token))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        void testGetAllUserProduct_SuccessSearchByNameAdmin() throws Exception {
+            String token2 = JwtUtil.generateToken(testUser2.getUsername(),testUser2.getRole());
+            mvc.perform(get("/product")
+                            .param("page","0")
+                            .param("size","5")
+                            .param("sortBy","name")
+                            .param("direction","desc")
+                            .param("search","Laptop")
+                            .header("Authorization", "Bearer "+token2))
+                    .andExpect(status().isOk());
+        }
     }
 
     @DisplayName("Testing Update Product: All Results")

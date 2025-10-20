@@ -43,7 +43,7 @@ public class ProductService implements IProductService {
      * @throws UserNotFoundException if no user was found with the given username
      */
     @Override
-    public Page<ProductDto> getAllUserProductsByUsername(String username, int page, int size, String sortBy, String direction) {
+    public Page<ProductDto> getAllUserProductsByUsername(String username, int page, int size, String sortBy, String direction,String search) {
         log.info("Fetching products for user: {}, page {}, size {}, sortBy {}, direction {} ",username,page,size,sortBy,direction);
         //Finds user by username, throws exception if not found
        User user = repoU.findByUsername(username).orElseThrow(()->{
@@ -58,8 +58,16 @@ public class ProductService implements IProductService {
         Pageable pageable = PageRequest.of(page,size,sort);
 
         //Fetches Paginated product data for the given user
-        Page<Product> productPage = repo.findByUserUsername(username,pageable);
-        log.debug("Found {} products for user {}",productPage.getTotalElements(),username);
+        Page<Product> productPage;
+
+        if(user.getRole().equals(Role.ADMIN) && search!= null && !search.trim().isEmpty()){
+            productPage = repo.findByNameContainingIgnoreCase(search,pageable);
+        } else if (search!=null && !search.trim().isEmpty()) {
+            productPage = repo.searchProductByUserAndName(username,search,pageable);
+        }
+        else {
+            productPage = repo.findByUserUsername(username,pageable);
+        }
 
         //if user is Admin, fetches product regardless
         if (user.getRole().equals(Role.ADMIN)) {

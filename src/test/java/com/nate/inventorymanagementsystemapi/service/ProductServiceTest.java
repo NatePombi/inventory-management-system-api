@@ -67,12 +67,29 @@ public class ProductServiceTest {
         when(repo.findByUserUsername("Tester",pageable)).thenReturn(productPage);
         when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
 
-        Page<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester",0,5,"name","desc");
+        Page<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester",0,5,"name","desc","");
 
         assertNotNull(productDtos);
 
 
         assertEquals(2, productDtos.getContent().size(),"Should have 2 products present");
+    }
+
+    @Test
+    @DisplayName("Get all User Product by Username Test: Success")
+    void testGetAllUserProductByUsername_SuccessSearchByName(){
+        Product prod = mock(Product.class);
+        Pageable pageable = PageRequest.of(0,5, Sort.by("name").descending());
+        Page<Product> productPage = new PageImpl<>(List.of(mockProduct,prod));
+
+        when(prod.getUser()).thenReturn(mockUser);
+        when(repo.searchProductByUserAndName("Tester","laptop",pageable)).thenReturn(productPage);
+        when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
+
+        Page<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester",0,5,"name","desc","laptop");
+
+        assertNotNull(productDtos);
+
     }
 
 
@@ -83,7 +100,7 @@ public class ProductServiceTest {
         Page<Product> productPage = new PageImpl<>(List.of());
         when(repoU.findByUsername("Tester")).thenReturn(Optional.of(mockUser));
         when(repo.findByUserUsername("Tester",pageable)).thenReturn(productPage);
-        Page<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester",0,5,"name","asc");
+        Page<ProductDto> productDtos = service.getAllUserProductsByUsername("Tester",0,5,"name","asc","");
 
         assertTrue(productDtos.isEmpty(),"Should be empty");
     }
