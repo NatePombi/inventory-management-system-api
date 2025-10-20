@@ -228,15 +228,40 @@ public class ProductControllerTest {
 
             Page<ProductDto> page = new PageImpl<>(List.of(productDto,productDto2,productDto3));
 
-            when(service.getAllUserProductsByUsername("tester",0,5,"name","desc")).thenReturn(page);
+            when(service.getAllUserProductsByUsername("tester",0,5,"name","desc","")).thenReturn(page);
 
             mockMvc.perform(get("/product")
                             .param("page", "0")
                             .param("size", "5")
                             .param("sortBy", "name")
                             .param("direction", "desc")
+                            .param("search","")
                     .header("Authorization", "Bearer Fake-jwt-token")
                     .with(csrf()))
+                    .andExpect(status().isOk());
+
+
+        }
+
+        @Test
+        void testGetAllUserProduct_SuccessSearchByName() throws Exception {
+            ProductDto productDto = new ProductDto();
+            ProductDto productDto2 = new ProductDto();
+            ProductDto productDto3= new ProductDto();
+
+
+            Page<ProductDto> page = new PageImpl<>(List.of(productDto,productDto2,productDto3));
+
+            when(service.getAllUserProductsByUsername("tester",0,5,"name","desc","laptop")).thenReturn(page);
+
+            mockMvc.perform(get("/product")
+                            .param("page", "0")
+                            .param("size", "5")
+                            .param("sortBy", "name")
+                            .param("direction", "desc")
+                            .param("search","laptop")
+                            .header("Authorization", "Bearer Fake-jwt-token")
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
 

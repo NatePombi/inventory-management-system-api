@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IProductService {
 
-    Page<ProductDto> getAllUserProductsByUsername(String username, int page, int size, String sortBy, String direction);
+    Page<ProductDto> getAllUserProductsByUsername(String username, int page, int size, String sortBy, String direction,String search);
     ProductDto addProduct(PostProduct product, String username);
     ProductDto getProduct(Long id,String username);
     boolean deleteProduct(Long id,String username);
