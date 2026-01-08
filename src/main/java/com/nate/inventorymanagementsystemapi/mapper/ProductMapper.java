@@ -4,6 +4,8 @@ import com.nate.inventorymanagementsystemapi.dto.ProductDto;
 import com.nate.inventorymanagementsystemapi.model.Product;
 import com.nate.inventorymanagementsystemapi.model.User;
 
+import java.time.Instant;
+
 public class ProductMapper {
 
     public static Product toEntity(ProductDto productDto, User user){
@@ -16,7 +18,8 @@ public class ProductMapper {
                 productDto.getName(),
                 productDto.getQuantity(),
                 productDto.getPrice(),
-                user
+                user,
+                productDto.getCreatedAt()
         );
     }
 
@@ -30,7 +33,8 @@ public class ProductMapper {
                 product.getName(),
                 product.getQuantity(),
                 product.getPrice(),
-                product.getUser() != null ? product.getUser().getId() : null
+                product.getUser() != null ? product.getUser().getId() : null,
+                product.getCreated() != null ? product.getCreated() : Instant.now()
         );
     }
 

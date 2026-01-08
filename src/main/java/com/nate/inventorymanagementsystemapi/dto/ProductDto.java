@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Setter @Getter @AllArgsConstructor @NoArgsConstructor
 public class ProductDto {
@@ -14,4 +15,5 @@ public class ProductDto {
     private int quantity;
     private BigDecimal price;
     private Long userId;
+    private Instant createdAt;
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
@@ -26,4 +27,6 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+    @Column(nullable = false, updatable = false)
+    private Instant created;
 }

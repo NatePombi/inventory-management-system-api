@@ -28,6 +28,7 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -91,12 +92,14 @@ public class ProductControllerIntegrationTest {
         testProduct.setUser(testUser);
         testProduct.setPrice(BigDecimal.valueOf(300));
         testProduct.setName("Laptop");
+        testProduct.setCreated(Instant.now());
 
         testProduct2 = new Product();
         testProduct2.setQuantity(4);
         testProduct2.setPrice(BigDecimal.valueOf(300));
         testProduct2.setName("Laptop");
         testProduct2.setUser(testUser2);
+        testProduct2.setCreated(Instant.now());
 
         repository.save(testProduct);
         repository.save(testProduct2);
