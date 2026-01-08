@@ -59,8 +59,6 @@ Right now it’s fully functional, but I’ll keep improving it over time.
 
 ### Future Plans
 
-* Timestamps (createdAt, updatedAt) for products
-
 * Docker & Docker Compose (with Postgres)
 
 * Deploy online (Railway/Render/Heroku) for live demo
