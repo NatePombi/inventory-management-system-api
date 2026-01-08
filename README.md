@@ -182,13 +182,13 @@ Login User
 **POST** `/auth/login`
 ```json
 {
-  "username": "john_doe",
+  "username": "john",
   "password": "password123"
 }
 ```
 
 Create Product
-**POST** `/api/products`
+**POST** `/product`
 ```json
 {
   "name": "Laptop",

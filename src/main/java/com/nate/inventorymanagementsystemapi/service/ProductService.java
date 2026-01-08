@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @AllArgsConstructor
@@ -101,6 +102,7 @@ public class ProductService implements IProductService {
         dto.setName(product.getName());
         dto.setQuantity(product.getQuantity());
         dto.setPrice(product.getPrice());
+        dto.setCreatedAt(Instant.now());
 
         //Map the ProductDto to Product entity using the mapper
         Product product1 = ProductMapper.toEntity(dto,user);

@@ -3,7 +3,7 @@
 		"_postman_id": "b97a5a56-220c-40a9-b814-4827f5633c4d",
 		"name": "Inventory Management System API",
 		"description": "This collection contains all endpoints for the Inventory Management System API.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "47056194"
 	},
 	"item": [
@@ -13,8 +13,24 @@
 				{
 					"name": "Post Register",
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwtToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"john\",\r\n  \"email\": \"john@gmail.com\",\r\n  \"password\": \"pass123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/auth/register"
 					},
 					"response": [
 						{
@@ -31,18 +47,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "http://localhost:8080/auth/register",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"auth",
-										"register"
-									]
-								}
+								"url": "http://localhost:8080/auth/register"
 							},
 							"status": "Created",
 							"code": 201,
@@ -100,9 +105,45 @@
 				},
 				{
 					"name": "Post Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successfully Post request\",function(){\r",
+									"    pm.expect(pm.request.code).to.be.oneOf([200,201])\r",
+									"})\r",
+									"\r",
+									"let jasonData = pm.request.jasonData();\r",
+									"    if(jasonData.token){\r",
+									"        pm.environment.set(\"jwtToken\",jasonData.token);\r",
+									"    }"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwtToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"john\",\r\n  \"password\": \"pass123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/auth/login"
 					},
 					"response": [
 						{
@@ -119,18 +160,7 @@
 										}
 									}
 								},
-								"url": {
-									"raw": "http://localhost:8080/auth/login",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"auth",
-										"login"
-									]
-								}
+								"url": "http://localhost:8080/auth/login"
 							},
 							"status": "OK",
 							"code": 200,
@@ -194,8 +224,24 @@
 				{
 					"name": "Post Create Produc",
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwtToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Laptop\",\r\n  \"description\": \"HP Pavilion 15\",\r\n  \"price\": 14999.99,\r\n  \"quantity\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/product"
 					},
 					"response": [
 						{
@@ -205,28 +251,18 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"laptop\",\n    \"quantity\": 4,\n    \"price\": 200.00\n}",
+									"raw": "{\r\n  \"name\": \"Laptop\",\r\n  \"description\": \"HP Pavilion 15\",\r\n  \"price\": 14999.99,\r\n  \"quantity\": 10\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
 										}
 									}
 								},
-								"url": {
-									"raw": "http://localhost:8080/product",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"product"
-									]
-								}
+								"url": "http://localhost:8080/product"
 							},
 							"status": "Created",
 							"code": 201,
-							"_postman_previewlanguage": "json",
+							"_postman_previewlanguage": null,
 							"header": [
 								{
 									"key": "X-Content-Type-Options",
@@ -262,7 +298,7 @@
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 01 Oct 2025 19:27:43 GMT"
+									"value": "Thu, 08 Jan 2026 16:14:17 GMT"
 								},
 								{
 									"key": "Keep-Alive",
@@ -274,7 +310,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"id\": 4,\n    \"name\": \"laptop\",\n    \"quantity\": 4,\n    \"price\": 200,\n    \"userId\": 5\n}"
+							"body": "{\n    \"id\": 2,\n    \"name\": \"Laptop\",\n    \"quantity\": 10,\n    \"price\": 14999.99,\n    \"userId\": 2,\n    \"createdAt\": \"2026-01-08T16:14:16.907164100Z\"\n}"
 						}
 					]
 				},
@@ -286,26 +322,19 @@
 					},
 					"response": [
 						{
-							"name": "Get Product",
+							"name": "Get Product by ID",
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/product/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"product",
-										"1"
-									]
-								}
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Laptop\",\r\n  \"description\": \"HP Pavilion 15\",\r\n  \"price\": 14999.99,\r\n  \"quantity\": 10\r\n}"
+								},
+								"url": "http://localhost:8080/product/2"
 							},
 							"status": "OK",
 							"code": 200,
-							"_postman_previewlanguage": "json",
+							"_postman_previewlanguage": "",
 							"header": [
 								{
 									"key": "X-Content-Type-Options",
@@ -341,7 +370,7 @@
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 01 Oct 2025 19:39:42 GMT"
+									"value": "Thu, 08 Jan 2026 16:16:12 GMT"
 								},
 								{
 									"key": "Keep-Alive",
@@ -353,15 +382,29 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"id\": 4,\n    \"name\": \"laptop\",\n    \"quantity\": 4,\n    \"price\": 200,\n    \"userId\": 5\n}"
+							"body": "{\n    \"id\": 2,\n    \"name\": \"Laptop\",\n    \"quantity\": 10,\n    \"price\": 14999.99,\n    \"userId\": 2,\n    \"createdAt\": \"2026-01-08T16:14:16.907164Z\"\n}"
 						}
 					]
 				},
 				{
 					"name": "Get All Products by User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwtToken}}"
+							}
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "http://localhost:8080/product"
 					},
 					"response": [
 						{
@@ -369,21 +412,15 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/product",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"product"
-									]
-								}
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://localhost:8080/product"
 							},
 							"status": "OK",
 							"code": 200,
-							"_postman_previewlanguage": "json",
+							"_postman_previewlanguage": "",
 							"header": [
 								{
 									"key": "X-Content-Type-Options",
@@ -419,7 +456,7 @@
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 01 Oct 2025 19:41:25 GMT"
+									"value": "Thu, 08 Jan 2026 17:51:29 GMT"
 								},
 								{
 									"key": "Keep-Alive",
@@ -431,15 +468,31 @@
 								}
 							],
 							"cookie": [],
-							"body": "[\n    {\n        \"id\": 4,\n        \"name\": \"laptop\",\n        \"quantity\": 4,\n        \"price\": 200,\n        \"userId\": 5\n    }\n]"
+							"body": "{\n    \"data\": [\n        {\n            \"id\": 2,\n            \"name\": \"Laptop\",\n            \"quantity\": 10,\n            \"price\": 14999.99,\n            \"userId\": 2,\n            \"createdAt\": \"2026-01-08T16:14:16.907164Z\"\n        }\n    ],\n    \"currentPage\": 0,\n    \"totalPage\": 1,\n    \"totalItems\": 1,\n    \"last\": true\n}"
 						}
 					]
 				},
 				{
 					"name": "Patch: Update Product",
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwtToken}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Laptop\",\r\n  \"description\": \"HP Pavilion 15\",\r\n  \"price\": 14999.99,\r\n  \"quantity\": 13\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/product/3"
 					},
 					"response": [
 						{
@@ -449,29 +502,18 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"Laptop\",\n    \"quantity\": 2,\n    \"price\": 200.00\n}",
+									"raw": "{\r\n  \"name\": \"Laptop\",\r\n  \"description\": \"HP Pavilion 15\",\r\n  \"price\": 14999.99,\r\n  \"quantity\": 13\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
 										}
 									}
 								},
-								"url": {
-									"raw": "http://localhost:8080/product/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"product",
-										"1"
-									]
-								}
+								"url": "http://localhost:8080/product/3"
 							},
 							"status": "OK",
 							"code": 200,
-							"_postman_previewlanguage": "json",
+							"_postman_previewlanguage": "",
 							"header": [
 								{
 									"key": "X-Content-Type-Options",
@@ -507,7 +549,7 @@
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 01 Oct 2025 21:21:11 GMT"
+									"value": "Thu, 08 Jan 2026 17:57:37 GMT"
 								},
 								{
 									"key": "Keep-Alive",
@@ -519,15 +561,26 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"id\": 4,\n    \"name\": \"Laptop\",\n    \"quantity\": 2,\n    \"price\": 200,\n    \"userId\": 5\n}"
+							"body": "{\n    \"id\": 3,\n    \"name\": \"Laptop\",\n    \"quantity\": 13,\n    \"price\": 14999.99,\n    \"userId\": 2,\n    \"createdAt\": \"2026-01-08T17:57:12.050724Z\"\n}"
 						}
 					]
 				},
 				{
 					"name": "Delete Product",
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwtToken}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "http://localhost:8080/product/2"
 					},
 					"response": [
 						{
@@ -535,22 +588,15 @@
 							"originalRequest": {
 								"method": "DELETE",
 								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/product/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"product",
-										"1"
-									]
-								}
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://localhost:8080/product/2"
 							},
 							"status": "OK",
 							"code": 200,
-							"_postman_previewlanguage": "json",
+							"_postman_previewlanguage": "",
 							"header": [
 								{
 									"key": "X-Content-Type-Options",
@@ -586,7 +632,7 @@
 								},
 								{
 									"key": "Date",
-									"value": "Wed, 01 Oct 2025 21:23:11 GMT"
+									"value": "Thu, 08 Jan 2026 17:55:54 GMT"
 								},
 								{
 									"key": "Keep-Alive",
@@ -603,6 +649,43 @@
 					]
 				}
 			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{jwtToken}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"pm.test(\"Successfull Post request\",function(){\r",
+					"    pm.expect(pm.response.code).to.be.oneOf([200,201])\r",
+					"});\r",
+					"\r",
+					"let jsonData = pm.response.json()\r",
+					"    if(jsonData.token){\r",
+					"        pm.environment.set(\"jwtToken\",jsonData.token);\r",
+					"    }"
+				]
+			}
 		}
 	]
 }
